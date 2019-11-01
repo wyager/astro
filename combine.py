@@ -35,9 +35,8 @@ def add(im,ims):
     for load_im2 in ims:
         im2 = load_im2(None)
         M = match(im2,im)
-        source = im2.copy()
-        out += cv2.warpPerspective(source,M,(w,h))
-        counter = np.full(source.shape[0:2],1.0)
+        out += cv2.warpPerspective(im2,M,(w,h))
+        counter = np.full(im2.shape[0:2],1.0)
         count += cv2.warpPerspective(counter,M,(w,h))
     return (out/out.max(),count/count.max())
         
