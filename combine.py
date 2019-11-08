@@ -82,14 +82,20 @@ def load_img(path):
 if __name__ == '__main__':
     images = sys.argv[1:]
     main_img= images[0]
+    main_img = load_img(main_img)
     other_imgs = images[1:]
 
-    combined,count = add(load_img(main_img),((lambda: load_img(path)) for path in other_imgs))
+    combined,count = add(main_img,((lambda: load_img(path)) for path in other_imgs))
     # Any pixel that didn't come from every single image gets marked as white so we can crop it out
     valid_region = count > 0.99
-    for ch in [0,1,2]:
-        combined[:,:,ch] *= valid_region
-        combined[:,:,ch] += -(valid_region - 1)
+    (_,_,*chs) = main_img.shape
+    if chs == []:
+        combined *= valid_region
+        combined += -(valid_region - 1)
+    else:
+        for ch in range(chs[0]):
+            combined[:,:,ch] *= valid_region
+            combined[:,:,ch] += -(valid_region - 1)
     print("saving to combined.tiff")
     imageio.imsave('combined.tiff',(combined*65535).astype('uint16'))
     imageio.imsave('mask.png',(np.stack([count,count,count],axis=-1)*255).astype('uint8'))
